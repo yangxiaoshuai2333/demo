@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style rel="stylesheet">
+        /*重点部分CSS的，最外层的容器需要设置relative，而且宽度高度和照片一致
+        第二层的设置宽度要等于照片的宽度和而且还要略微加一点，
+        最后一层的设置要和图片宽度一致，并且设置overflow=hidden。
+
+        图标按钮需要设置绝对定位。并设置一个类标明是当前图片，图标一定要加display=inline-block*/
+        *{
+            padding: 0;
+            margin: 0;
+        }
+        .container{
+            position: relative;
+            margin: 0 auto;
+            width: 389px;
+        }
+        .display{
+            width: 384px;
+            height: 200px;
+            overflow: hidden;
+        }
+        .photolist{
+            width: 1165px;
+            height: 200px;
+        }
+        #spanlist{
+            position: absolute;
+            bottom: 20px;
+            right: 30px;
+            width: 100px;
+            height: 30px;
+        }
+        .active{
+            background-color: yellow;
+        }
+        span{
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 1px solid black;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="display">
+        <div class="photolist">
+            <img src="img/384x200_01.png">
+            <img src="img/384x200_02.png">
+            <img src="img/384x200_03.png">
+        </div>
+    </div>
+    <div id="spanlist">
+        <span data-index="0" class="active"></span>
+        <span data-index="1"></span>
+        <span data-index="2"></span>
+    </div>
+</div>
+<script>
+let index=0;
+let photolist=document.getElementsByClassName('photolist')[0];
+let spanList=document.getElementsByTagName('span');
+var time=null;
+    function changeImg(){
+        spanList[index].classList.remove('active');
+        index++;
+        if (index>2){
+            index=0;
+        }
+        photolist.style.marginLeft=-388*index+ 'px';
+        spanList[index].classList.add('active');
+    }
+    time=setInterval(changeImg,2000);
+photolist.onmouseover=function () {
+    clearInterval(time);
+}
+photolist.onmouseout=function () {
+    time=setInterval(changeImg,2000);
+}
+
+document.getElementById('spanlist').onclick=function (e) {
+    let event=e|| window.event;
+    let target=event.target||window.target;
+    if(target.nodeName.toLowerCase()==='span'){
+        spanList[index].classList.remove('active');
+        index=target.getAttribute('data-index')
+        photolist.style.marginLeft=-388*index+'px';
+        spanList[index].classList.add('active');
+        clearInterval(time);
+    }
+
+}
+
+</script>
+</body>
+</html>
