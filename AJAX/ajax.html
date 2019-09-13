@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<form method="get">
+    <label>请输入地址：<input id="text" type="text"></label>
+    <div id="address"></div>
+    <button id="button" type="button">获取经纬度</button>
+</form>
+<script src="jquery-3.3.1.min.js"></script>
+<script>
+var text=document.getElementById('text');
+var button=document.getElementById('button');
+//自己写的ajax替代程序。
+function ajax(object){
+    object=object||{};
+    object.type=(object.type||'get').toUpperCase();
+    object.dataType=object.dataType||'json';
+    var datas=change(object.data);
+    console.log(datas);
+    var xhr=new XMLHttpRequest();
+
+    if(object.type=='POST'){
+        xhr.open('post',object.url,true);
+        xhr.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
+        xhr.send(datas);
+    }else {
+        xhr.open('get',object.url+'?'+datas)
+        xhr.send(null);
+    }
+
+    xhr.onreadystatechange=function () {
+        console.log(xhr.response);
+
+        if (xhr.readyState===4&&xhr.status===200){
+            object.success(JSON.parse(xhr.responseText));
+        }else {
+            object.error(xhr.status);
+        }
+    }
+}
+function change(data){
+    var arr=[];
+    for(var index in data){
+        arr.push(encodeURIComponent(index)+'='+encodeURIComponent(data[index]))
+    }
+    return arr.join('&');
+}
+button.onclick=function () {
+   //原生JS主要处理好get请求发送的数据，需要转格式之后添加在url之后。
+    var address=text.value;
+/*   var xhr=new XMLHttpRequest();
+    xhr.open('get','https://restapi.amap.com/v3/geocode/geo'+'?'+encodeURIComponent('address')+'='+encodeURIComponent(address)+'&'
+        +encodeURIComponent('key')+'='+'7486e10d3ca83a934438176cf941df0c');
+        console.log(encodeURIComponent('address')+'='+encodeURIComponent(address)+'&'
+        +encodeURIComponent('key')+'='+'7486e10d3ca83a934438176cf941df0c');
+    xhr.send(null);
+    xhr.onreadystatechange=function () {
+        //获取之后的类型还要转换类型，因为返回的JSON串而不是对象。
+        if(xhr.readyState===4&&xhr.status===200){
+            var data=JSON.parse(xhr.response);
+            document.getElementById('address').innerText='经纬度为'+ data.geocodes[0].location;
+            console.log(data);
+        }
+   }
+*/
+//post方法要加上头文件 。而且发送的数据也要转化格式。
+
+//用jquery实现成功了，
+   // 按照XHR2规范可以在服务器端配置请求头文件的属性，解决Ajax跨域问题 Access-Control_Allow-Origin : *
+ajax({
+    url:'https://restapi.amap.com/v3/geocode/geo',
+    type:'get',
+    dataType:'json',
+    data:{
+        address:address,
+        key:'7486e10d3ca83a934438176cf941df0c'
+    },
+    success:function (data) {
+        document.getElementById('address').innerText='经纬度为'+ data.geocodes[0].location;
+        console.log(data);
+    },
+    error:function () {
+        console.log('error');
+    }
+})
+/*
+    var str = document.getElementById("text").value;
+    $.ajax
+    ({
+        url: "https://restapi.amap.com/v3/geocode/geo",
+        dataType: "json",
+        type: "get",
+        data: {
+            address: str,
+            key: "7486e10d3ca83a934438176cf941df0c",
+        },
+        success:function(data){
+            alert(data.geocodes[0].formatted_address+"经纬度："+data.geocodes[0].location);
+            console.log(data);  //在console中查看数据
+        },
+        error:function(){
+            alert('failed!');
+        },
+    });
+    */
+}
+</script>
+</body>
+</html>
