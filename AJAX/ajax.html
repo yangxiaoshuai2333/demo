@@ -50,8 +50,17 @@ function change(data){
     return arr.join('&');
 }
 button.onclick=function () {
-   //原生JS主要处理好get请求发送的数据，需要转格式之后添加在url之后。
+//fetch如果用post，参数改为一个Request对象。可以new Request（{里面包括url，method：和header
+// 以及mode等post需要的属性。}）
+
     var address=text.value;
+    var url='https://restapi.amap.com/v3/geocode/geo'+'?'+encodeURIComponent('address')+'='+encodeURIComponent(address)+'&'
+        +encodeURIComponent('key')+'='+'7486e10d3ca83a934438176cf941df0c';
+    fetch(url).then(response=>response.json())
+        .then(function (data) {
+            document.getElementById('address').innerText='经纬度为'+ data.geocodes[0].location;
+        }).catch(e=>console.log(e));
+//原生JS主要处理好get请求发送的数据，需要转格式之后添加在url之后。
 /*   var xhr=new XMLHttpRequest();
     xhr.open('get','https://restapi.amap.com/v3/geocode/geo'+'?'+encodeURIComponent('address')+'='+encodeURIComponent(address)+'&'
         +encodeURIComponent('key')+'='+'7486e10d3ca83a934438176cf941df0c');
@@ -71,7 +80,7 @@ button.onclick=function () {
 
 //用jquery实现成功了，
    // 按照XHR2规范可以在服务器端配置请求头文件的属性，解决Ajax跨域问题 Access-Control_Allow-Origin : *
-ajax({
+/*ajax({
     url:'https://restapi.amap.com/v3/geocode/geo',
     type:'get',
     dataType:'json',
